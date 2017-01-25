@@ -43,7 +43,7 @@ describe 'UserComms' do
       context 'when the user is asked to select an increment choice' do
         it "outputs 'major, minor, or patch?' to the console" do
           @user_comms.ask_increment_type
-          expect(@stdout).to have_received(:puts).with(UserComms::ask_increment_type)
+          expect(@stdout).to have_received(:puts).with(UserComms::ASK_USER_INCREMENT_TYPE)
         end
       end
     end

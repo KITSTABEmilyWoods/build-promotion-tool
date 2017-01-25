@@ -4,34 +4,35 @@ require './git_helper'
 require './user_comms'
 
 class Deploy
-  def initialize(environ)
+  def initialize(environ, git_helper, user_comms, develop_tag_generator, tags)
     @environ = environ
     @environ.downcase
+    @git_helper = git_helper
+    @user_comms = user_comms
+    @develop_tag_generator = develop_tag_generator
+    @tags = tags
   end
 
   def environment_choice
-    @git_helper = GitHelper.new #Should be injected
-    tags = correctly_formatted_tags(@git_helper.all_tags)
-    @user_comms = UserComms.new(STDOUT, STDIN)
-
     case @environ
     when "develop"
-      develop = DevelopTagGenerator.new(tags)
-      unless develop.develop_tag_exists?
+      @tags = correctly_formatted_tags(@tags)
+      unless @develop_tag_generator.develop_tag_exists?
         @user_comms.tell_user_no_develop_tags
-        apply_tag?(develop.first_tag)
+        apply_tag?(@develop_tag_generator.first_tag)
         @git_helper.apply_tag(develop.first_tag)  if @user_comms.user_reply_y_or_n == "y"
         return
       end
 
       to_increment = increment_choice
-      next_tag = develop.next_develop_tag(to_increment)
+      next_tag = @develop_tag_generator.next_develop_tag(to_increment)
       apply_tag?(next_tag)
       @user_comms.say_thank_you
 
     when "test"
     when "stage"
     else
+      "what"
     end
   end
 
@@ -59,5 +60,9 @@ class Deploy
   end
 end
 
-deploy = Deploy.new(ARGV[0])
+git_helper = GitHelper.new
+user_comms  = UserComms.new(STDOUT, STDIN)
+tags = git_helper.all_tags
+develop_tag_generator = DevelopTagGenerator.new(tags)
+deploy = Deploy.new(ARGV[0], git_helper, user_comms, develop_tag_generator,tags)
 deploy.environment_choice
