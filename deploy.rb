@@ -6,7 +6,6 @@ require './user_comms'
 class Deploy
   def initialize(environ, git_helper, user_comms, develop_tag_generator, tags)
     @environ = environ
-    @environ.downcase
     @git_helper = git_helper
     @user_comms = user_comms
     @develop_tag_generator = develop_tag_generator
@@ -14,21 +13,18 @@ class Deploy
   end
 
   def environment_choice
+    @environ.downcase
     case @environ
     when "develop"
-      @tags = correctly_formatted_tags(@tags)
       unless @develop_tag_generator.develop_tag_exists?
         @user_comms.tell_user_no_develop_tags
         apply_tag?(@develop_tag_generator.first_tag)
-        @git_helper.apply_tag(develop.first_tag)  if @user_comms.user_reply_y_or_n == "y"
-        return
+      else
+        to_increment = increment_choice
+        next_tag = @develop_tag_generator.next_develop_tag(to_increment)
+        apply_tag?(next_tag)
       end
-
-      to_increment = increment_choice
-      next_tag = @develop_tag_generator.next_develop_tag(to_increment)
-      apply_tag?(next_tag)
       @user_comms.say_thank_you
-
     when "test"
     when "stage"
     else
@@ -36,6 +32,7 @@ class Deploy
     end
   end
 
+  private
   def increment_choice
     loop do
       @user_comms.ask_increment_type
@@ -54,15 +51,16 @@ class Deploy
       break if ['y', 'n'].include? answer
     end
   end
-
-  def correctly_formatted_tags(tags)
-    tags.select {|tag| /^dev|test|stage-v\d+.\d+.\d*$/ =~ tag}
-  end
 end
 
 git_helper = GitHelper.new
 user_comms  = UserComms.new(STDOUT, STDIN)
 tags = git_helper.all_tags
+tags.select {|tag| /^dev|test|stage-v\d+.\d+.\d*$/ =~ tag}
 develop_tag_generator = DevelopTagGenerator.new(tags)
-deploy = Deploy.new(ARGV[0], git_helper, user_comms, develop_tag_generator,tags)
-deploy.environment_choice
+if ARGV[0].nil?
+  user_comms.error_no_environ_selected
+else
+  deploy = Deploy.new(ARGV[0], git_helper, user_comms, develop_tag_generator,tags)
+  deploy.environment_choice
+end
