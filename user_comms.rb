@@ -7,8 +7,8 @@ class UserComms
   ERROR_NEXT_TAG_NOT_ASSIGNED = "Next tag has not been assigned"
   ERROR_SELECT_Y_OR_N = "Error: please select y/n"
   ERROR_NO_ENVIRON_SELECTED = "Error: please select to apply develop, test, or stage tag\
-                              \n e.g. ruby deploy.rb develop
-                              \n"
+                              \n e.g. ruby deploy.rb develop\n"
+  ERROR_COMMIT_HAS_DEV_TAG = "Error: a develop tag has already been applied to this commit"
 
   def initialize(stdout, stdin)
     @stdout = stdout if stdout.respond_to?(:puts)
@@ -57,6 +57,18 @@ class UserComms
 
   def error_no_environ_selected
     @stdout.puts ERROR_NO_ENVIRON_SELECTED
+  end
+
+  def error_commit_has_dev_tag
+    @stdout.puts ERROR_COMMIT_HAS_DEV_TAG
+  end
+
+  def tell_user_no_tag(tag_type)
+    @stdout.puts "Error: there are no previous #{tag_type} tags on this commit"
+  end
+
+  def tell_user_already_a_tag(tag_type)
+    @stdout.puts "Error: There is already a #{tag_type} tag on this commit"
   end
 
 end
