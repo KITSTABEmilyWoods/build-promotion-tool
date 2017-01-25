@@ -6,6 +6,9 @@ class UserComms
   ERROR_SELECT_ACCEPTED_INCREMENT_TYPE = "Error: please select major, minor or patch update"
   ERROR_NEXT_TAG_NOT_ASSIGNED = "Next tag has not been assigned"
   ERROR_SELECT_Y_OR_N = "Error: please select y/n"
+  ERROR_NO_ENVIRON_SELECTED = "Error: please select to apply develop, test, or stage tag\
+                              \n e.g. ruby deploy.rb develop
+                              \n"
 
   def initialize(stdout, stdin)
     @stdout = stdout if stdout.respond_to?(:puts)
@@ -51,4 +54,9 @@ class UserComms
   def say_no_tag_applied
     @stdout.puts "No tag applied"
   end
+
+  def error_no_environ_selected
+    @stdout.puts ERROR_NO_ENVIRON_SELECTED
+  end
+
 end
