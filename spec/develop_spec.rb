@@ -1,5 +1,5 @@
 require 'rspec'
-require_relative '../develop_tag_generator'
+require_relative '../generator/develop_tag_generator'
 
 describe 'DevelopTagGenerator' do
   describe 'develop_tag_exists' do

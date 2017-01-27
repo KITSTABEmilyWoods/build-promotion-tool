@@ -1,4 +1,4 @@
-require './version'
+require_relative '../comparator/version'
 
 class DevelopTagGenerator
   def initialize(tags)

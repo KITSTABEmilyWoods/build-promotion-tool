@@ -1,5 +1,5 @@
 require 'rspec'
-require_relative '../deploy_controller.rb'
+require_relative '../controller/deploy_controller.rb'
 
 describe 'DeployController' do
 
