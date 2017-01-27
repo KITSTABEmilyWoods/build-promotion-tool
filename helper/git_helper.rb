@@ -16,4 +16,7 @@ class GitHelper
 
   end
 
+  def fetch_tags
+  end
+
 end

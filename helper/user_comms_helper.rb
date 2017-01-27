@@ -1,4 +1,4 @@
-class UserComms
+class UserCommsHelper
 
   ERROR_INITIALISE_WITH_STRING_IO = "Initialise with StringIO objects"
   TELL_USER_NO_DEVELOP_TAGS = "No develop tags exist for this repository"
@@ -6,8 +6,8 @@ class UserComms
   ERROR_SELECT_ACCEPTED_INCREMENT_TYPE = "Error: please select major, minor or patch update"
   ERROR_NEXT_TAG_NOT_ASSIGNED = "Next tag has not been assigned"
   ERROR_SELECT_Y_OR_N = "Error: please select y/n"
-  ERROR_NO_ENVIRON_SELECTED = "Error: please select to apply develop, test, or stage tag\
-                              \n e.g. ruby deploy.rb develop\n"
+  ERROR_INCORRECT_ENVIRON = "Error: please select to apply develop, test, or stage tag\
+                              \n e.g. ruby deploy.rb develop \n"
   ERROR_COMMIT_HAS_DEV_TAG = "Error: a develop tag has already been applied to this commit"
 
   def initialize(stdout, stdin)
@@ -55,8 +55,8 @@ class UserComms
     @stdout.puts "No tag applied"
   end
 
-  def error_no_environ_selected
-    @stdout.puts ERROR_NO_ENVIRON_SELECTED
+  def error_incorrect_environ
+    @stdout.puts ERROR_INCORRECT_ENVIRON
   end
 
   def error_commit_has_dev_tag

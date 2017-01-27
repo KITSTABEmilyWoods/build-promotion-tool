@@ -1,15 +1,15 @@
-require './develop_tag_generator'
-require './test_tag_generator'
-require './git_helper'
-require './user_comms'
+require_relative '../generator/develop_tag_generator'
+require_relative '../generator/test_and_stage_tag_generator'
+require_relative '../helper/git_helper'
+require_relative '../helper/user_comms_helper'
 
 class DeployController
-  def initialize(environ, git_helper, user_comms, develop_tag_generator, test_tag_generator)
+  def initialize(environ, git_helper, user_comms, develop_tag_generator, test_and_stage_tag_generator)
     @environ = environ
     @git_helper = git_helper
     @user_comms = user_comms
     @develop_tag_generator = develop_tag_generator
-    @test_tag_generator = test_tag_generator
+    @test_and_stage_tag_generator = test_and_stage_tag_generator
   end
 
   def environment_choice
@@ -18,14 +18,14 @@ class DeployController
 
     case @environ
     when "develop"
-      if @test_tag_generator.check_for_tag?("dev", @tags_for_this_commit)
+      if @test_and_stage_tag_generator.check_for_tag?("dev", @tags_for_this_commit)
         @user_comms.error_commit_has_dev_tag
         return
       end
 
       unless @develop_tag_generator.develop_tag_exists?
         @user_comms.tell_user_no_develop_tags
-        apply_tag?(@develop_tag_generator.first_tag)
+        apply_tag(@develop_tag_generator.first_tag)
       else
         to_increment = increment_choice
         next_tag = @develop_tag_generator.next_develop_tag(to_increment)
@@ -33,17 +33,26 @@ class DeployController
       end
 
     when "test"
-      if !@test_tag_generator.check_for_tag?("dev", @tags_for_this_commit)
+      if !@test_and_stage_tag_generator.check_for_tag?("dev", @tags_for_this_commit)
         @user_comms.tell_user_no_tag("dev")
-      elsif @test_tag_generator.check_for_tag?("test", @tags_for_this_commit)
+      elsif @test_and_stage_tag_generator.check_for_tag?("test", @tags_for_this_commit)
         @user_comms.tell_user_already_a_tag("test")
       else
-        apply_tag(@test_tag_generator.next_tag("dev", "test", @tags_for_this_commit))
+        apply_tag(@test_and_stage_tag_generator.next_tag("dev", "test", @tags_for_this_commit))
       end
+
     when "stage"
+      if !@test_and_stage_tag_generator.check_for_tag?("test", @tags_for_this_commit)
+        @user_comms.tell_user_no_tag("test")
+      elsif @test_and_stage_tag_generator.check_for_tag?("stage", @tags_for_this_commit)
+        @user_comms.tell_user_already_a_tag("stage")
+      else
+        apply_tag(@test_and_stage_tag_generator.next_tag("test", "stage", @tags_for_this_commit))
+      end
     else
-      "what"
+      @user_comms.error_incorrect_environ
     end
+
     @user_comms.say_thank_you
   end
 

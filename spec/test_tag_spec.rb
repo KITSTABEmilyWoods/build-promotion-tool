@@ -1,9 +1,9 @@
 require 'rspec'
-require_relative '../test_tag_generator'
+require_relative '../generator/test_and_stage_tag_generator'
 
-describe 'TestTagGenerator' do
+describe 'TestAndStageTagGenerator' do
   before(:each) do
-    @test_tag_generator = TestTagGenerator.new
+    @test_tag_generator = TestAndStageTagGenerator.new
   end
 
   describe 'check_for_tag?' do

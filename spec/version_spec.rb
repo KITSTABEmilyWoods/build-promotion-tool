@@ -1,5 +1,5 @@
 require 'rspec'
-require_relative '../version'
+require_relative '../comparator/version'
 
 def expectBigger(smaller, bigger)
   expect(smaller <=> bigger).to eql(-1)
