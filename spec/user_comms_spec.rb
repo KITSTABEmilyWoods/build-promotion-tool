@@ -1,7 +1,7 @@
 require 'rspec'
-require_relative '../user_comms'
+require_relative '../helper/user_comms_helper.rb'
 
-describe 'UserComms' do
+describe 'UserCommsHelper' do
   before(:each) do
     @stdout = spy('STDOUT')
     @stdin = spy('STDIN', gets:'major')
@@ -10,32 +10,32 @@ describe 'UserComms' do
   describe 'initialize' do
     context 'when all class arguments received are null' do
       it 'raises an error' do
-        expect { UserComms.new(nil, nil) }.to raise_error.with_message(UserComms::ERROR_INITIALISE_WITH_STRING_IO)
+        expect { UserCommsHelper.new(nil, nil) }.to raise_error.with_message(UserCommsHelper::ERROR_INITIALISE_WITH_STRING_IO)
       end
     end
 
     context 'when STDOUT is null but STDIN is not' do
       it 'raises an error' do
-        expect { UserComms.new(nil, @stdin) }.to raise_error.with_message(UserComms::ERROR_INITIALISE_WITH_STRING_IO)
+        expect { UserCommsHelper.new(nil, @stdin) }.to raise_error.with_message(UserCommsHelper::ERROR_INITIALISE_WITH_STRING_IO)
       end
     end
 
     context 'when STDIN is null but STDOUT is not' do
       it 'raises an error' do
-        expect { UserComms.new(@stdout, nil) }.to raise_error.with_message(UserComms::ERROR_INITIALISE_WITH_STRING_IO)
+        expect { UserCommsHelper.new(@stdout, nil) }.to raise_error.with_message(UserCommsHelper::ERROR_INITIALISE_WITH_STRING_IO)
       end
     end
   end
 
   before(:each) do
-    @user_comms = UserComms.new(@stdout, @stdin)
+    @user_comms = UserCommsHelper.new(@stdout, @stdin)
   end
 
   describe 'tell_user_no_develop_tags' do
     context 'when there are no develop tags in the repository' do
       it 'outputs a response that there are no develop tags' do
         @user_comms.tell_user_no_develop_tags
-        expect(@stdout).to have_received(:puts).with(UserComms::TELL_USER_NO_DEVELOP_TAGS)
+        expect(@stdout).to have_received(:puts).with(UserCommsHelper::TELL_USER_NO_DEVELOP_TAGS)
       end
     end
 
@@ -43,7 +43,7 @@ describe 'UserComms' do
       context 'when the user is asked to select an increment choice' do
         it "outputs 'major, minor, or patch?' to the console" do
           @user_comms.ask_increment_type
-          expect(@stdout).to have_received(:puts).with(UserComms::ASK_USER_INCREMENT_TYPE)
+          expect(@stdout).to have_received(:puts).with(UserCommsHelper::ASK_USER_INCREMENT_TYPE)
         end
       end
     end
@@ -67,7 +67,7 @@ describe 'UserComms' do
         it "returns an error asking the user to choose major, minor, or patch" do
           allow(@stdin).to receive(:gets).and_return("hello")
           @user_comms.user_increment_choice
-          expect(@stdout).to have_received(:puts).with(UserComms::ERROR_SELECT_ACCEPTED_INCREMENT_TYPE)
+          expect(@stdout).to have_received(:puts).with(UserCommsHelper::ERROR_SELECT_ACCEPTED_INCREMENT_TYPE)
         end
       end
     end
@@ -90,7 +90,7 @@ describe 'UserComms' do
         end
 
         it 'raises an exception if no value assigned to tag' do
-          expect{@user_comms.ask_permissison_to_apply(@next_tag)}.to raise_error.with_message(UserComms::ERROR_NEXT_TAG_NOT_ASSIGNED)
+          expect{@user_comms.ask_permissison_to_apply(@next_tag)}.to raise_error.with_message(UserCommsHelper::ERROR_NEXT_TAG_NOT_ASSIGNED)
         end
       end
     end
@@ -112,7 +112,7 @@ describe 'UserComms' do
         it "returns an error telling the user that they need to input yes or no" do
           allow(@stdin).to receive(:gets).and_return('u')
           @user_comms.user_reply_y_or_n
-          expect(@stdout).to have_received(:puts).with(UserComms::ERROR_SELECT_Y_OR_N)
+          expect(@stdout).to have_received(:puts).with(UserCommsHelper::ERROR_SELECT_Y_OR_N)
         end
       end
 
