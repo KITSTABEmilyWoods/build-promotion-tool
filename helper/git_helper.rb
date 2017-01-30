@@ -16,12 +16,12 @@ class GitHelper
     `git fetch --tags`
   end
 
-  def push_tag
-    `git push origin`
+  def push_tag_to_remote
+    `git push origin HEAD`
   end
 
 
 end
 
 git_helper = GitHelper.new
-git_helper.fetch_tags
+git_helper.push_tag_to_remote
