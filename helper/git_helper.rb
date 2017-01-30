@@ -16,11 +16,8 @@ class GitHelper
     `git tag #{tag}`
   end
 
-  def push_tags_to_remote(tag)
+  def push_tag_to_remote(tag)
     `git push origin #{tag}`
   end
 
 end
-
-g = GitHelper.new
-g.push_tags_to_remote('dev-v4.4.4')
