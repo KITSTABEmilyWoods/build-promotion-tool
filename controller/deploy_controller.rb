@@ -40,6 +40,7 @@ class DeployController
         @user_comms.tell_user_already_a_tag("test")
       else
         apply_tag(@test_tag_generator.next_tag("dev", "test", @tags_for_this_commit))
+        @git_helper.push_tag_to_remote(next_tag)
       end
 
     when "stage"
@@ -49,7 +50,7 @@ class DeployController
         @user_comms.tell_user_already_a_tag("stage")
       else
         apply_tag(@test_tag_generator.next_tag("test", "stage", @tags_for_this_commit))
-
+        @git_helper.push_tag_to_remote(next_tag)
       end
     else
       @user_comms.error_incorrect_environ
