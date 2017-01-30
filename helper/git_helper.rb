@@ -19,5 +19,5 @@ class GitHelper
   def push_tag_to_remote(tag)
     `git push origin #{tag}`
   end
-
+  
 end
