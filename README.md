@@ -34,38 +34,57 @@ __Applying a stage tag__
 __Tests Completed for Synchronising remote tags with local repo__  
 - A new tag is applied and pushed to the remote for develop, test and stage when the most recent tag has been applied locally
 
-When the user would like to apply a new <tag>
-And the most recent tag has been applied locally
-Then the tag number is updated and pushed to the repo
-  |tag      |
+Given the most recent tag has been applied locally
+When the user would like to apply a new <tag-type> tag
+Then the tag number is updated
+And the tag pushed to the repo
+  |tag-type |
   |develop  |
+  |test     |
   |stage    |
+
+
+Given the most recent develop tag is on the remote
+When the user would like to like to apply a new <tag-type> tag
+Then the tag number is updated using the remote tag version number  
+And the tag is pushed to the repo
+  |tag-type |
+  |develop  |
+  |test     |
+
+Given the most recent test tag is on the remote
+When the user would like to like to apply a new <tag-type> tag
+Then the tag number is updated using the remote tag version number  
+And the tag is pushed to the repo
+  |tag-type |
+  |develop  |
   |test     |
 
 
 
 
+
 - Delete most recent tag locally, stay on same commit.
- 1. Update develop tag
- 2. Update test tag
- 3. Update stage tag
+1. Update develop tag
+2. Update test tag
+3. Update stage tag
 
- 1. Update test tag (without updating develop)
+1. Update test tag (without updating develop)
 
- 1. Update stage tag (without updating test)
+1. Update stage tag (without updating test)
 
- - Delete most recent tag locally (contained on remote). Add a new develop tag. Is the next dev/test/stage number updated?
-
-
+- Delete most recent tag locally (contained on remote). Add a new develop tag. Is the next dev/test/stage number updated?
 
 
- - Delete most recent tags locally, stay on same commit.
-  1. Update develop tag
-  2. Update test tag
-  3. Update stage tag
 
-  1. Update test tag (without updating develop)
 
-  1. Update stage tag (without updating test)
+- Delete most recent tags locally, stay on same commit.
+1. Update develop tag
+2. Update test tag
+3. Update stage tag
 
-  - Delete most recent tags locally (contained on remote). Add a new develop tag. Is the next dev/test/stage number updated? Is the new number pushed to remote.
+1. Update test tag (without updating develop)
+
+1. Update stage tag (without updating test)
+
+- Delete most recent tags locally (contained on remote). Add a new develop tag. Is the next dev/test/stage number updated? Is the new number pushed to remote.
