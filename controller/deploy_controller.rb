@@ -70,7 +70,10 @@ class DeployController
     @user_comms.ask_permissison_to_apply(next_tag)
     loop do
       answer = @user_comms.user_reply_y_or_n
-      @git_helper.apply_tag(next_tag) if answer == "y"
+      if answer == "y"
+        @git_helper.apply_tag(next_tag)
+        @git_helper.push_tag_to_remote(next_tag)
+      end
       @user_comms.say_no_tag_applied if answer =="n"
       break if ['y', 'n'].include? answer
     end
