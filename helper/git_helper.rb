@@ -12,11 +12,16 @@ class GitHelper
     `git tag --points-at HEAD`.lines
   end
 
-  def push_tag
-
-  end
-
   def fetch_tags
+    `git fetch --tags`
   end
+
+  def push_tag
+    `git push origin`
+  end
+
 
 end
+
+git_helper = GitHelper.new
+git_helper.fetch_tags
