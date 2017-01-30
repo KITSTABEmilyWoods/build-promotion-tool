@@ -3,6 +3,7 @@ require './controller/deploy_controller'
 class Deploy
   git_helper = GitHelper.new
   user_comms  = UserCommsHelper.new(STDOUT, STDIN)
+  git_helper.fetch_tags
   tags = git_helper.all_tags
   tags.select {|tag| /^dev|test|stage-v\d+.\d+.\d*$/ =~ tag}
   develop_tag_generator = DevelopTagGenerator.new(tags)

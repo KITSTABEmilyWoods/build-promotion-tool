@@ -35,7 +35,7 @@ class UserCommsHelper
 
   def ask_permissison_to_apply(next_tag)
     raise ERROR_NEXT_TAG_NOT_ASSIGNED if next_tag.nil?
-    @stdout.puts "Do you want to apply develop tag: #{next_tag}? - y/n"
+    @stdout.puts "Do you want to apply tag: #{next_tag}? - y/n"
   end
 
   def user_reply_y_or_n
