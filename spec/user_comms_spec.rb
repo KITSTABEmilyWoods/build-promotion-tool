@@ -80,7 +80,7 @@ describe 'UserCommsHelper' do
 
         it 'asks if user would like to apply the next tag' do
           @user_comms.ask_permissison_to_apply(@next_tag)
-          expect(@stdout).to have_received(:puts).with("Do you want to apply develop tag: #{@next_tag}? - y/n")
+          expect(@stdout).to have_received(:puts).with("Do you want to apply tag: #{@next_tag}? - y/n")
         end
       end
 
@@ -115,13 +115,33 @@ describe 'UserCommsHelper' do
           expect(@stdout).to have_received(:puts).with(UserCommsHelper::ERROR_SELECT_Y_OR_N)
         end
       end
+    end
 
-      describe 'say_thank_you' do
-        context 'when the user has made a decision' do
-          it 'outputs thank you' do
-            @user_comms.say_thank_you
-            expect(@stdout).to have_received(:puts).with("Thank you!")
-          end
+    describe 'tell_user_no_tag'do
+     context 'when the there are no develop tags on the commit' do
+       @tag_type = 'develop'
+       it 'tells the user that there is no develop tag' do
+         @user_comms.tell_user_no_tag(@tag_type)
+         expect(@stdout).to have_received(:puts).with("Error: there are no previous #{@tag_type} tags on this commit")
+       end
+     end
+    end
+
+    describe 'tell_user_already_a_tag'do
+     context 'when there is already a test tag on the commit' do
+       @tag_type = 'test'
+       it 'tells the user that there is already a test tag' do
+         @user_comms.tell_user_already_a_tag(@tag_type)
+         expect(@stdout).to have_received(:puts).with("Error: There is already a #{@tag_type} tag on this commit")
+       end
+     end
+    end
+
+    describe 'say_thank_you' do
+      context 'when the user has made a decision' do
+        it 'outputs thank you' do
+          @user_comms.say_thank_you
+          expect(@stdout).to have_received(:puts).with("Thank you!")
         end
       end
     end
