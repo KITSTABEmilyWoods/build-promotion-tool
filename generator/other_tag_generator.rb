@@ -1,8 +1,8 @@
 require_relative '../comparator/version'
 
-class TestAndStageTagGenerator
+class OtherTagGenerator
 
-  def check_for_tag?(check_tag_type, tags_for_this_commit)
+  def tag_exists?(check_tag_type, tags_for_this_commit)
     tags_for_this_commit.any? {|tag| /^#{check_tag_type}-v\d+.\d+.\d*$/ =~ tag}
   end
 
