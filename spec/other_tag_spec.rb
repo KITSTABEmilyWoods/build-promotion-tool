@@ -1,55 +1,55 @@
 require 'rspec'
-require_relative '../generator/test_and_stage_tag_generator'
+require_relative '../generator/other_tag_generator'
 
-describe 'TestAndStageTagGenerator' do
+describe 'OtherTagGenerator' do
   before(:each) do
-    @test_tag_generator = TestAndStageTagGenerator.new
+    @test_tag_generator = OtherTagGenerator.new
   end
 
-  describe 'check_for_tag?' do
+  describe 'tag_exists?' do
     before(:each) do
       @check_tag_type = 'dev'
     end
 
     context 'when there are no develop tags on the commit but there are other tags' do
       it 'says there are no develop tag' do
-        expect(@test_tag_generator.check_for_tag?(@check_tag_type, ['test-v1.1.1', 'test-v1.2.1'])).to eql(false)
+        expect(@test_tag_generator.tag_exists?(@check_tag_type, ['test-v1.1.1', 'test-v1.2.1'])).to eql(false)
       end
     end
 
     context 'when there are no tags on the commit' do
       it 'says there are no develop tag' do
-        expect(@test_tag_generator.check_for_tag?(@check_tag_type, [])).to eql(false)
+        expect(@test_tag_generator.tag_exists?(@check_tag_type, [])).to eql(false)
       end
     end
 
     context 'when there is a develop tag on the commit' do
       it 'says there is a develop tag' do
-        expect(@test_tag_generator.check_for_tag?(@check_tag_type, ['dev-v0.1.1'])).to eql(true)
+        expect(@test_tag_generator.tag_exists?(@check_tag_type, ['dev-v0.1.1'])).to eql(true)
       end
     end
 
     context 'when there is both a develop and test tag on the commit' do
       it 'says there is a develop tag' do
-        expect(@test_tag_generator.check_for_tag?(@check_tag_type, ['dev-v0.1.1', 'test-v0.1.1'])).to eql(true)
+        expect(@test_tag_generator.tag_exists?(@check_tag_type, ['dev-v0.1.1', 'test-v0.1.1'])).to eql(true)
       end
     end
 
     context 'when there is a tag kind of like deveop' do
       it 'says there is a develop tag' do
-        expect(@test_tag_generator.check_for_tag?(@check_tag_type, ['dev-v0.1.1adljalal'])).to eql(false)
+        expect(@test_tag_generator.tag_exists?(@check_tag_type, ['dev-v0.1.1adljalal'])).to eql(false)
       end
     end
 
     context 'when there is a different tag type' do
       it 'says there is a develop tag' do
-        expect(@test_tag_generator.check_for_tag?(@check_tag_type, ['hello'])).to eql(false)
+        expect(@test_tag_generator.tag_exists?(@check_tag_type, ['hello'])).to eql(false)
       end
     end
 
     context 'when there are more than one dev tags' do
       it 'says there is a develop tag' do
-        expect(@test_tag_generator.check_for_tag?(@check_tag_type, ['dev-v0.1.1', 'dev-v0.1.2'])).to eql(true)
+        expect(@test_tag_generator.tag_exists?(@check_tag_type, ['dev-v0.1.1', 'dev-v0.1.2'])).to eql(true)
       end
     end
 
@@ -59,7 +59,7 @@ describe 'TestAndStageTagGenerator' do
       end
 
       it 'says there is a test tag' do
-        expect(@test_tag_generator.check_for_tag?(@check_tag_type, ['test-v0.1.1'])).to eql(true)
+        expect(@test_tag_generator.tag_exists?(@check_tag_type, ['test-v0.1.1'])).to eql(true)
       end
     end
   end

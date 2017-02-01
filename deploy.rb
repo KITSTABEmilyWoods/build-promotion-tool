@@ -10,7 +10,7 @@ class Deploy
   if ARGV[0].nil?
     user_comms.error_incorrect_environ
   else
-    deploy = DeployController.new(ARGV[0], git_helper, user_comms, develop_tag_generator, TestAndStageTagGenerator.new)
+    deploy = DeployController.new(ARGV[0], git_helper, user_comms, develop_tag_generator, OtherTagGenerator.new)
     deploy.environment_choice
   end
 end
