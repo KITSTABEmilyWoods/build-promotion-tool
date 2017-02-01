@@ -1,12 +1,10 @@
 require_relative '../generator/develop_tag_generator'
 require_relative '../generator/other_tag_generator'
-require_relative '../helper/git_helper'
 require_relative '../helper/user_comms_helper'
 
 class DeployController
-  def initialize(environ, git_helper, user_comms, develop_tag_generator, other_tag_generator)
+  def initialize(environ, user_comms, develop_tag_generator, other_tag_generator)
     @environ = environ
-    @git_helper = git_helper
     @user_comms = user_comms
     @develop_tag_generator = develop_tag_generator
     @other_tag_generator = other_tag_generator
@@ -14,7 +12,7 @@ class DeployController
 
   def environment_choice
     @environ.downcase
-    @tags_for_this_commit = @git_helper.get_tags_for_this_commit
+    @tags_for_this_commit = GitHelper.get_tags_for_this_commit
 
     case @environ
     when "develop"
@@ -71,8 +69,8 @@ class DeployController
     loop do
       answer = @user_comms.user_reply_y_or_n
       if answer == "y"
-        @git_helper.apply_tag(next_tag)
-        @git_helper.push_tag_to_remote(next_tag)
+        GitHelper.apply_tag(next_tag)
+        GitHelper.push_tag_to_remote(next_tag)
       end
       @user_comms.say_no_tag_applied if answer =="n"
       break if ['y', 'n'].include? answer

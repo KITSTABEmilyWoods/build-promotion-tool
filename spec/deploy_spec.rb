@@ -10,7 +10,7 @@ describe 'DeployController' do
 
   describe 'environment_choice' do
 
-    subject(:deploy) {DeployController.new('develop', git_helper, user_comms, develop_tag_generator, other_tag_generator)}
+    subject(:deploy) {DeployController.new('develop', user_comms, develop_tag_generator, other_tag_generator)}
 
     before(:each) do
       allow(git_helper).to receive(:get_tags_for_this_commit)
@@ -115,7 +115,7 @@ describe 'DeployController' do
       describe 'test' do
         context ' when the user would like to apply a test tag'do
 
-        subject(:deploy) {DeployController.new('test', git_helper, user_comms, develop_tag_generator, other_tag_generator)}
+        subject(:deploy) {DeployController.new('test', user_comms, develop_tag_generator, other_tag_generator)}
 
         context 'when there is a develop tag, dev-v0.1.5 on the commit' do
           before(:each) do
@@ -170,7 +170,7 @@ describe 'DeployController' do
         describe 'stage' do
           context ' when the user would like to apply a stage tag'do
 
-            subject(:deploy) {DeployController.new('stage', git_helper, user_comms, develop_tag_generator, other_tag_generator)}
+            subject(:deploy) {DeployController.new('stage', user_comms, develop_tag_generator, other_tag_generator)}
 
             context 'when there is a test tag, test-v0.1.5 on the commit' do
               before(:each) do
