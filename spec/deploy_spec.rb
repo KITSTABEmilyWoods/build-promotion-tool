@@ -72,76 +72,157 @@ describe 'DeployController' do
       end
 
       context 'when there is already a develop tag on the commit'do
-      before(:each) do
-        allow(other_tag_generator).to receive(:tag_exists?).and_return(true)
-      end
-
-      it "tells the user that there is already at dev tag on the commit" do
-        deploy.environment_choice
-        expect(user_comms).to have_received(:error_commit_has_dev_tag)
-      end
-    end
-
-      context 'when there are no tags on the repository'do
         before(:each) do
-          @dev_tag = 'dev-v0.0.1'
-          allow(other_tag_generator).to receive(:tag_exists?).and_return(false)
-          allow(develop_tag_generator).to receive(:develop_tag_exists?).and_return(false)
-
-          allow(user_comms).to receive(:tell_user_no_develop_tags)
-          allow(develop_tag_generator).to receive(:first_tag).and_return(@dev_tag)
-
-          allow(user_comms).to receive(:ask_permissison_to_apply)
-          allow(user_comms).to receive(:user_reply_y_or_n).and_return('y')
+          allow(other_tag_generator).to receive(:tag_exists?).and_return(true)
         end
 
-        it "asks the user's permission to apply the first tag" do
+        it "tells the user that there is already at dev tag on the commit" do
           deploy.environment_choice
-          expect(user_comms).to have_received(:ask_permissison_to_apply).with(@dev_tag)
-        end
-
-        it "applies the first tag" do
-          deploy.environment_choice
-          expect(git_helper).to have_received(:apply_tag).with(@dev_tag)
-        end
-
-        it "pushes the first tag" do
-          deploy.environment_choice
-          expect(git_helper).to have_received(:push_tag_to_remote).with(@dev_tag)
+          expect(user_comms).to have_received(:error_commit_has_dev_tag)
         end
       end
-    end
 
-    describe 'test' do
-      context ' when the user would like to apply a test tag'do
+        context 'when there are no tags on the repository'do
+          before(:each) do
+            @dev_tag = 'dev-v0.0.1'
+            allow(other_tag_generator).to receive(:tag_exists?).and_return(false)
+            allow(develop_tag_generator).to receive(:develop_tag_exists?).and_return(false)
 
-      subject(:deploy) {DeployController.new('test', git_helper, user_comms, develop_tag_generator, other_tag_generator)}
+            allow(user_comms).to receive(:tell_user_no_develop_tags)
+            allow(develop_tag_generator).to receive(:first_tag).and_return(@dev_tag)
 
-      context 'when there is a develop tag, dev-v0.1.5 on the commit' do
-        before(:each) do
-          @test_tag = 'test-v0.1.5'
-          @tags_for_this_commit = ['dev-v0.1.1', 'dev-v0.2.0']
+            allow(user_comms).to receive(:ask_permissison_to_apply)
+            allow(user_comms).to receive(:user_reply_y_or_n).and_return('y')
+          end
 
-          allow(other_tag_generator).to receive(:tag_exists?).with('dev', @tags_for_this_commit).and_return(true)
-          allow(other_tag_generator).to receive(:tag_exists?).with('test', @tags_for_this_commit).and_return(false)
+          it "asks the user's permission to apply the first tag" do
+            deploy.environment_choice
+            expect(user_comms).to have_received(:ask_permissison_to_apply).with(@dev_tag)
+          end
 
-          allow(other_tag_generator).to receive(:next_tag).and_return(@test_tag)
+          it "applies the first tag" do
+            deploy.environment_choice
+            expect(git_helper).to have_received(:apply_tag).with(@dev_tag)
+          end
 
-          allow(user_comms).to receive(:ask_permissison_to_apply).with(@test_tag)
-          allow(user_comms).to receive(:user_reply_y_or_n).and_return('y')
-        end
-
-        it 'applies a test tag, test-v0.1.5' do
-          deploy.environment_choice
-          expect(other_tag_generator).to have_received(:tag_exists?).with('test', ['dev-v0.1.5'])
-        end
-
-        it 'applies a test tag, test-v0.1.5' do
-          deploy.environment_choice
-          expect(user_comms).to have_received(:ask_permissison_to_apply).with(@test_tag)
+          it "pushes the first tag" do
+            deploy.environment_choice
+            expect(git_helper).to have_received(:push_tag_to_remote).with(@dev_tag)
+          end
         end
       end
-    end
+
+      describe 'test' do
+        context ' when the user would like to apply a test tag'do
+
+        subject(:deploy) {DeployController.new('test', git_helper, user_comms, develop_tag_generator, other_tag_generator)}
+
+        context 'when there is a develop tag, dev-v0.1.5 on the commit' do
+          before(:each) do
+            @tags_for_this_commit = ['dev-v0.1.1', 'dev-v0.2.0']
+            @test_tag = 'test-v0.1.5'
+
+            allow(git_helper).to receive(:get_tags_for_this_commit).and_return(@tags_for_this_commit)
+
+            allow(other_tag_generator).to receive(:tag_exists?).with('dev', @tags_for_this_commit).and_return(true)
+            allow(other_tag_generator).to receive(:tag_exists?).with('test', @tags_for_this_commit).and_return(false)
+
+            allow(other_tag_generator).to receive(:next_tag).and_return(@test_tag)
+
+            allow(user_comms).to receive(:ask_permissison_to_apply)
+            allow(user_comms).to receive(:user_reply_y_or_n).and_return('y')
+          end
+
+          context 'when the user says yes to applying the next tag' do
+            before(:each) do
+              allow(user_comms).to receive(:user_reply_y_or_n).and_return('y')
+            end
+
+            it 'asks permission to apply test tag, test-v0.1.5' do
+              deploy.environment_choice
+              expect(user_comms).to have_received(:ask_permissison_to_apply).with(@test_tag)
+            end
+
+            it 'applies a test tag, test-v0.1.5' do
+              deploy.environment_choice
+              expect(git_helper).to have_received(:push_tag_to_remote).with(@test_tag)
+            end
+          end
+
+          context 'when the user says no to applying the next tag' do
+            before(:each) do
+              allow(user_comms).to receive(:user_reply_y_or_n).and_return('n')
+            end
+
+            it 'asks permission to apply test tag, test-v0.1.5' do
+              deploy.environment_choice
+              expect(user_comms).to have_received(:ask_permissison_to_apply).with(@test_tag)
+            end
+
+            it 'says no tag has been applied' do
+              deploy.environment_choice
+              expect(user_comms).to have_received(:say_no_tag_applied)
+            end
+          end
+        end
+
+
+        describe 'stage' do
+          context ' when the user would like to apply a stage tag'do
+
+            subject(:deploy) {DeployController.new('stage', git_helper, user_comms, develop_tag_generator, other_tag_generator)}
+
+            context 'when there is a test tag, test-v0.1.5 on the commit' do
+              before(:each) do
+                @tags_for_this_commit = ['dev-v0.1.1', 'test-v0.2.0']
+                @stage_tag = 'test-v0.2.0'
+
+                allow(git_helper).to receive(:get_tags_for_this_commit).and_return(@tags_for_this_commit)
+
+                allow(other_tag_generator).to receive(:tag_exists?).with('test', @tags_for_this_commit).and_return(true)
+                allow(other_tag_generator).to receive(:tag_exists?).with('stage', @tags_for_this_commit).and_return(false)
+
+                allow(other_tag_generator).to receive(:next_tag).and_return(@stage_tag)
+
+                allow(user_comms).to receive(:ask_permissison_to_apply)
+              end
+
+              context 'when the user says yes to applying the next tag' do
+                before(:each) do
+                  allow(user_comms).to receive(:user_reply_y_or_n).and_return('y')
+                end
+
+                it 'asks permission to apply test tag, stage-v0.1.5' do
+                  deploy.environment_choice
+                  expect(user_comms).to have_received(:ask_permissison_to_apply).with(@stage_tag)
+                end
+
+                it 'applies a stage tag, stage-v0.1.5' do
+                  deploy.environment_choice
+                  expect(git_helper).to have_received(:push_tag_to_remote).with(@stage_tag)
+                end
+              end
+
+
+              context 'when the user says no to applying the next tag' do
+                before(:each) do
+                  allow(user_comms).to receive(:user_reply_y_or_n).and_return('n')
+                end
+
+                it 'asks permission to apply stage tag, test-v0.1.5' do
+                  deploy.environment_choice
+                  expect(user_comms).to have_received(:ask_permissison_to_apply).with(@stage_tag)
+                end
+
+                it 'says no tag has been applied' do
+                  deploy.environment_choice
+                  expect(user_comms).to have_received(:say_no_tag_applied)
+                end
+              end
+            end
+          end
+        end
+      end
     end
   end
 end
