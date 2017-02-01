@@ -165,63 +165,6 @@ describe 'DeployController' do
             end
           end
         end
-
-
-        describe 'stage' do
-          context ' when the user would like to apply a stage tag'do
-
-            subject(:deploy) {DeployController.new('stage', git_helper, user_comms, develop_tag_generator, other_tag_generator)}
-
-            context 'when there is a test tag, test-v0.1.5 on the commit' do
-              before(:each) do
-                @tags_for_this_commit = ['dev-v0.1.1', 'test-v0.2.0']
-                @stage_tag = 'test-v0.2.0'
-
-                allow(git_helper).to receive(:get_tags_for_this_commit).and_return(@tags_for_this_commit)
-
-                allow(other_tag_generator).to receive(:tag_exists?).with('test', @tags_for_this_commit).and_return(true)
-                allow(other_tag_generator).to receive(:tag_exists?).with('stage', @tags_for_this_commit).and_return(false)
-
-                allow(other_tag_generator).to receive(:next_tag).and_return(@stage_tag)
-
-                allow(user_comms).to receive(:ask_permissison_to_apply)
-              end
-
-              context 'when the user says yes to applying the next tag' do
-                before(:each) do
-                  allow(user_comms).to receive(:user_reply_y_or_n).and_return('y')
-                end
-
-                it 'asks permission to apply test tag, stage-v0.1.5' do
-                  deploy.environment_choice
-                  expect(user_comms).to have_received(:ask_permissison_to_apply).with(@stage_tag)
-                end
-
-                it 'applies a stage tag, stage-v0.1.5' do
-                  deploy.environment_choice
-                  expect(git_helper).to have_received(:push_tag_to_remote).with(@stage_tag)
-                end
-              end
-
-
-              context 'when the user says no to applying the next tag' do
-                before(:each) do
-                  allow(user_comms).to receive(:user_reply_y_or_n).and_return('n')
-                end
-
-                it 'asks permission to apply stage tag, test-v0.1.5' do
-                  deploy.environment_choice
-                  expect(user_comms).to have_received(:ask_permissison_to_apply).with(@stage_tag)
-                end
-
-                it 'says no tag has been applied' do
-                  deploy.environment_choice
-                  expect(user_comms).to have_received(:say_no_tag_applied)
-                end
-              end
-            end
-          end
-        end
       end
     end
   end
