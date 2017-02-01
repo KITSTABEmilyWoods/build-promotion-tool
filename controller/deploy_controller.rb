@@ -4,8 +4,13 @@ require_relative '../helper/git_helper'
 require_relative '../helper/user_comms_helper'
 
 class DeployController
-  def initialize(environ, git_helper, user_comms, develop_tag_generator, other_tag_generator)
-    @environ = environ
+
+  attr_accessor :environ
+  attr_accessor :tag_types
+
+  def initialize(environ, git_helper, user_comms, develop_tag_generator, other_tag_generator, tag_types)
+    self.environ = environ
+    self.tag_types = tag_types
     @git_helper = git_helper
     @user_comms = user_comms
     @develop_tag_generator = develop_tag_generator
@@ -13,12 +18,14 @@ class DeployController
   end
 
   def environment_choice
-    @environ.downcase
+    environ.downcase
     @tags_for_this_commit = @git_helper.get_tags_for_this_commit
+    dev_tag = tag_types['first_deploy_step']
+    all_tags = tag_types['all_tags']
 
-    case @environ
-    when "develop"
-      if @other_tag_generator.tag_exists?("dev", @tags_for_this_commit)
+    case environ
+    when dev_tag
+      if @other_tag_generator.tag_exists?(dev_tag, @tags_for_this_commit)
         @user_comms.error_commit_has_dev_tag
         return
       end
@@ -32,31 +39,32 @@ class DeployController
         apply_tag(next_tag)
       end
 
-    when "test"
-      if !@other_tag_generator.tag_exists?("dev", @tags_for_this_commit)
-        @user_comms.tell_user_no_tag("dev")
-      elsif @other_tag_generator.tag_exists?("test", @tags_for_this_commit)
-        @user_comms.tell_user_already_a_tag("test")
-      else
-        apply_tag(@other_tag_generator.next_tag("dev", "test", @tags_for_this_commit))
-      end
-
-    when "stage"
-      if !@other_tag_generator.tag_exists?("test", @tags_for_this_commit)
-        @user_comms.tell_user_no_tag("test")
-      elsif @other_tag_generator.tag_exists?("stage", @tags_for_this_commit)
-        @user_comms.tell_user_already_a_tag("stage")
-      else
-        apply_tag(@other_tag_generator.next_tag("test", "stage", @tags_for_this_commit))
-      end
     else
-      @user_comms.error_incorrect_environ
-    end
+      if all_tags.include? environ
+        last_tag_index = all_tags.index(environ) - 1
+        last_tag_type = all_tags[last_tag_index]
+        select_next_tag(last_tag_type, environ)
+      else
+        @user_comms.error_incorrect_environ
+        return
+      end
 
+    end
     @user_comms.say_thank_you
   end
 
   private
+
+  def select_next_tag(last_tag_type, next_tag_type)
+    if !@other_tag_generator.tag_exists?(last_tag_type, @tags_for_this_commit)
+      @user_comms.tell_user_no_tag(last_tag_type)
+    elsif @other_tag_generator.tag_exists?(next_tag_type, @tags_for_this_commit)
+      @user_comms.tell_user_already_a_tag(next_tag_type)
+    else
+      apply_tag(@other_tag_generator.next_tag(last_tag_type, next_tag_type, @tags_for_this_commit))
+    end
+  end
+
   def increment_choice
     loop do
       @user_comms.ask_increment_type

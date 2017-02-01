@@ -1,13 +1,17 @@
 class UserCommsHelper
 
+  require 'yaml'
+  CONFIG = YAML.load_file("config.yml")
+  all_tags = CONFIG.fetch('tags')['all_tags']
+
   ERROR_INITIALISE_WITH_STRING_IO = "Initialise with StringIO objects"
   TELL_USER_NO_DEVELOP_TAGS = "No develop tags exist for this repository"
   ASK_USER_INCREMENT_TYPE = "Would you like to do a major, minor, or patch increment?"
   ERROR_SELECT_ACCEPTED_INCREMENT_TYPE = "Error: please select major, minor or patch update"
   ERROR_NEXT_TAG_NOT_ASSIGNED = "Next tag has not been assigned"
   ERROR_SELECT_Y_OR_N = "Error: please select y/n"
-  ERROR_INCORRECT_ENVIRON = "Error: please select to apply develop, test, or stage tag\
-                              \n e.g. ruby deploy.rb develop \n"
+  ERROR_INCORRECT_ENVIRON = "Error: please select to apply one of the following tags: #{all_tags}\
+                              \n e.g. ruby deploy.rb #{all_tags[0]} \n"
   ERROR_COMMIT_HAS_DEV_TAG = "Error: a develop tag has already been applied to this commit"
 
   def initialize(stdout, stdin)
