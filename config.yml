@@ -1,0 +1,8 @@
+tags:
+
+  first_deploy_step: dev
+
+  all_tags:
+    - dev
+    - test
+    - stage
