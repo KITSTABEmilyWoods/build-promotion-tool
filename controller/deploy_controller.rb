@@ -5,37 +5,36 @@ require_relative '../helper/user_comms_helper'
 
 class DeployController
 
-  attr_accessor :environ
-  attr_accessor :tag_types
+  attr_accessor :environ, :tag_types, :git_helper, :user_comms, :develop_tag_generator, :other_tag_generator
 
   def initialize(environ, git_helper, user_comms, develop_tag_generator, other_tag_generator, tag_types)
     self.environ = environ
     self.tag_types = tag_types
-    @git_helper = git_helper
-    @user_comms = user_comms
-    @develop_tag_generator = develop_tag_generator
-    @other_tag_generator = other_tag_generator
+    self.git_helper = git_helper
+    self.user_comms = user_comms
+    self.develop_tag_generator = develop_tag_generator
+    self.other_tag_generator = other_tag_generator
   end
 
   def environment_choice
     environ.downcase
-    @tags_for_this_commit = @git_helper.get_tags_for_this_commit
+    @tags_for_this_commit = git_helper.get_tags_for_this_commit
     dev_tag = tag_types['first_deploy_step']
     all_tags = tag_types['all_tags']
 
     case environ
     when dev_tag
-      if @other_tag_generator.tag_exists?(dev_tag, @tags_for_this_commit)
+      if other_tag_generator.tag_exists?(dev_tag, @tags_for_this_commit)
         @user_comms.error_commit_has_dev_tag
         return
       end
 
-      unless @develop_tag_generator.develop_tag_exists?
+      unless develop_tag_generator.develop_tag_exists?
         @user_comms.tell_user_no_develop_tags
-        apply_tag(@develop_tag_generator.first_tag)
+        apply_tag(develop_tag_generator.first_tag)
       else
         to_increment = increment_choice
-        next_tag = @develop_tag_generator.next_develop_tag(to_increment)
+        next_tag = develop_tag_generator.next_develop_tag(to_increment)
         apply_tag(next_tag)
       end
 
@@ -56,12 +55,12 @@ class DeployController
   private
 
   def select_next_tag(last_tag_type, next_tag_type)
-    if !@other_tag_generator.tag_exists?(last_tag_type, @tags_for_this_commit)
+    if !other_tag_generator.tag_exists?(last_tag_type, @tags_for_this_commit)
       @user_comms.tell_user_no_tag(last_tag_type)
-    elsif @other_tag_generator.tag_exists?(next_tag_type, @tags_for_this_commit)
+    elsif other_tag_generator.tag_exists?(next_tag_type, @tags_for_this_commit)
       @user_comms.tell_user_already_a_tag(next_tag_type)
     else
-      apply_tag(@other_tag_generator.next_tag(last_tag_type, next_tag_type, @tags_for_this_commit))
+      apply_tag(other_tag_generator.next_tag(last_tag_type, next_tag_type, @tags_for_this_commit))
     end
   end
 
@@ -79,8 +78,8 @@ class DeployController
     loop do
       answer = @user_comms.user_reply_y_or_n
       if answer == "y"
-        @git_helper.apply_tag(next_tag)
-        @git_helper.push_tag_to_remote(next_tag)
+        git_helper.apply_tag(next_tag)
+        git_helper.push_tag_to_remote(next_tag)
       end
       @user_comms.say_no_tag_applied if answer =="n"
       break if ['y', 'n'].include? answer
