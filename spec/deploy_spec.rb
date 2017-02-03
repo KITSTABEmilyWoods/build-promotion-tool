@@ -4,24 +4,24 @@ require_relative '../controller/deploy_controller.rb'
 describe 'DeployController' do
 
   let(:develop_tag_generator) {spy('develop_tag_generator')}
-  let(:git_helper) {spy('git_helper')}
-  let(:user_comms) {spy('user_comms')}
-  let(:other_tag_generator) {spy('other_tag_generator')}
+  let(:git_helper) { spy('git_helper') }
+  let(:user_comms) { spy('user_comms') }
+  let(:other_tag_generator) { spy('other_tag_generator') }
 
   describe 'environment_choice' do
 
-    subject(:deploy) {DeployController.new('develop', git_helper, user_comms, develop_tag_generator, other_tag_generator)}
+    subject(:deploy) {DeployController.new('dev', git_helper, user_comms, develop_tag_generator, other_tag_generator,tag_types)}
 
     before(:each) do
       allow(git_helper).to receive(:get_tags_for_this_commit)
     end
 
-    describe 'develop' do
+    describe 'dev' do
       context 'when the user request to apply a new develop tag with patch increment'
       before(:each) do
         @dev_tag = 'dev-v0.1.2'
         allow(other_tag_generator).to receive(:tag_exists?).and_return(false)
-        allow(develop_tag_generator).to receive(:develop_tag_exists).and_return(true)
+        allow(develop_tag_generator).to receive(:develop_tag_exists?).and_return(true)
 
         allow(user_comms).to receive(:ask_increment_type)
         allow(user_comms).to receive(:user_increment_choice).and_return('patch')
@@ -36,7 +36,7 @@ describe 'DeployController' do
 
         it "asks the user's perimission to apply tag dev-v0.1.2" do
           deploy.environment_choice
-          expect(user_comms).to have_received(:ask_permissison_to_apply).with(@dev_tag)
+          expect(develop_tag_generator).to have_received(:ask_permissison_to_apply).with(@dev_tag)
         end
 
         it 'receives the next tag to apply' do
@@ -112,7 +112,7 @@ describe 'DeployController' do
         end
       end
 
-      describe 'test' do
+      describe 'other_tag' do
         context ' when the user would like to apply a test tag'do
 
         subject(:deploy) {DeployController.new('test', git_helper, user_comms, develop_tag_generator, other_tag_generator)}
