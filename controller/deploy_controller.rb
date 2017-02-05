@@ -35,8 +35,6 @@ class DeployController
       else
         to_increment = increment_choice
         next_tag = develop_tag_generator.next_develop_tag(to_increment)
-
-
         apply_tag(next_tag)
       end
 

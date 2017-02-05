@@ -1,5 +1,4 @@
 require './controller/deploy_controller'
-
 require './config'
 
 class Deploy
